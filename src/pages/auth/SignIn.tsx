@@ -1,18 +1,26 @@
+import ErrorDialog, { ErrorDialogRef } from "@/components/ErrorDialog";
 import CheckField from "@/components/forms/CheckField";
 import InputField from "@/components/forms/InputField";
 import { Button } from "@/components/shadcn/ui/button";
 import { Form } from "@/components/shadcn/ui/form";
+import { Toaster } from "@/components/shadcn/ui/sonner";
+import Toast from "@/components/Toast";
 import { SignIn } from "@/types";
 import { SignInSchema } from "@/types/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin } from "@refinedev/core";
 import { Loader2 } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 const SignInPage = (): ReactNode => {
-    const { mutate, isLoading } = useLogin();
+    /*** refine hooks ***/
+    const { isLoading, mutateAsync } = useLogin();
 
+    /*** references ***/
+    const errorDialog = useRef<ErrorDialogRef>(null);
+
+    /*** form validation ***/
     const form = useForm<SignIn>({
         resolver: zodResolver(SignInSchema),
         defaultValues: {
@@ -22,12 +30,23 @@ const SignInPage = (): ReactNode => {
         },
     });
 
-    const submitForm = (data: SignIn) => {
-        mutate(data);
+    const submitForm = async (data: SignIn) => {
+        // mutate(data);
+        const response = await mutateAsync(data);
+
+        if (!response.success) {
+            Toast({ variant: "warning", description: <>{response.message}</> });
+        }
     };
 
     return (
         <Form {...form}>
+            {/* error dialog */}
+            <ErrorDialog ref={errorDialog} />
+
+            {/* hook */}
+            <Toaster />
+
             <form onSubmit={form.handleSubmit(submitForm)}>
                 <div className="w-full h-screen content-center">
                     <div className="flex items-center justify-center my-auto ">

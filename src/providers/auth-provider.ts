@@ -1,11 +1,12 @@
 import { axiosCustom } from "@/lib/http/axios";
 import { SignIn, SignInResponse } from "@/types";
+import { LocalStorageKey } from "@/types/enum";
 import { AuthProvider } from "@refinedev/core";
 import { HttpStatusCode } from "axios";
 
 export const authProvider: AuthProvider = {
     check: async () => {
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem(LocalStorageKey.ACCESS_TOKEN);
 
         return { authenticated: Boolean(token) };
     },
@@ -26,7 +27,10 @@ export const authProvider: AuthProvider = {
         const data: SignInResponse = response.data;
 
         // set token
-        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem(
+            LocalStorageKey.ACCESS_TOKEN,
+            `${data.token_type} ${data.access_token}`
+        );
 
         return { success: true, message: data.message };
     },
@@ -43,9 +47,22 @@ export const authProvider: AuthProvider = {
         }
 
         // remove token
-        localStorage.removeItem("access_token");
+        localStorage.removeItem(LocalStorageKey.ACCESS_TOKEN);
 
         return { success: true, message: response.data.message };
+    },
+    getIdentity: async () => {
+        // send request
+        const response = await axiosCustom({
+            url: "/profile",
+        });
+
+        // if status not what expect
+        if (![HttpStatusCode.Ok].includes(response.status)) {
+            return { success: false, message: response.data.message };
+        }
+
+        return response.data;
     },
     onError: async (error) => {
         if (error?.status === 401) {
@@ -66,19 +83,6 @@ export const authProvider: AuthProvider = {
     },
     updatePassword: async (params) => {
         throw new Error("Not implemented");
-    },
-    getIdentity: async () => {
-        // send request
-        const response = await axiosCustom({
-            url: "/profile",
-        });
-
-        // if status not what expect
-        if (![HttpStatusCode.Ok].includes(response.status)) {
-            return { success: false, message: response.data.message };
-        }
-
-        return response.data;
     },
     getPermissions: async () => {
         throw new Error("Not implemented");

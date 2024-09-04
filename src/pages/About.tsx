@@ -22,7 +22,7 @@ const About = (): ReactNode => {
                         application, if you don't remember your password. Please
                         contact your administrator.
                     </p>
-                    <p className="mt-5">IT CAS</p>
+                    <p className="mt-5">theadamz</p>
                 </div>
             </section>
         </>

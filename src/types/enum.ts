@@ -28,9 +28,13 @@ export enum StageLabel {
     CHECKED_OUT = "Checked Out",
 }
 
-export const getStage = (value: string, type: "value" | "label" | "variant" = "value") => {
+export const getStage = (
+    value: string,
+    type: "value" | "label" | "variant" = "value"
+) => {
     // get key stage
-    const stage = Object.keys(Stage)[Object.values(Stage).indexOf(value as Stage)];
+    const stage =
+        Object.keys(Stage)[Object.values(Stage).indexOf(value as Stage)];
 
     switch (type) {
         case "variant":
@@ -45,4 +49,8 @@ export const getStage = (value: string, type: "value" | "label" | "variant" = "v
 export enum CheckType {
     SELECT = "select", // only ok/no
     PHOTO = "photo",
+}
+
+export enum LocalStorageKey {
+    ACCESS_TOKEN = "access_token",
 }

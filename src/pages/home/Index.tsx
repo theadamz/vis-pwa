@@ -1,4 +1,5 @@
 import Card from "@/components/Card";
+import ErrorDialog, { ErrorDialogRef } from "@/components/ErrorDialog";
 import DefaultHeader from "@/components/layouts/headers/DefaultHeader";
 import Spinner from "@/components/Spinner";
 import { useLogout } from "@refinedev/core";
@@ -8,12 +9,24 @@ import {
     ScanSearchIcon,
     ScrollIcon,
 } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 const Index = (): ReactNode => {
-    const { mutate, isLoading } = useLogout();
+    /*** refine hooks ***/
+    const { mutate, isLoading, failureReason } = useLogout();
 
+    /*** effect ***/
+    useEffect(() => {
+        if (failureReason) {
+            errorDialog.current?.show({ message: failureReason.message });
+        }
+    }, [failureReason]);
+
+    /*** references ***/
+    const errorDialog = useRef<ErrorDialogRef>(null);
+
+    /*** events ***/
     const handleSignOut = () => {
         mutate();
     };
@@ -22,6 +35,9 @@ const Index = (): ReactNode => {
         <>
             {/* Header */}
             <DefaultHeader />
+
+            {/* error dialog */}
+            <ErrorDialog ref={errorDialog} />
 
             {/* main content */}
             <main className="flex flex-1 flex-col">
